@@ -16,7 +16,7 @@ joblib.dump(X_scaler, myscaler_filename)
 my_scaler = joblib.load(myscaler_filename)
 ```
 ## Team Predictor
-## HTML Code
+### HTML Code
 ```html
             <div class = "row">
                 <div class="col-md-2">
@@ -38,7 +38,7 @@ my_scaler = joblib.load(myscaler_filename)
                 </div>
             </div>
 ```
-## Javascript
+### Javascript
 ```javascript
 $('#team-versus-submit').on('click', function(e){
 	e.preventDefault();
@@ -123,7 +123,7 @@ $('#team-versus-submit').on('click', function(e){
 	 });
   });
 ```
-## Python Code
+### Python Code
 ```python
 @app.route("/api/predict_team_vs_team", methods=["POST"])
 def predictTeamVsTeam():
