@@ -16,6 +16,114 @@ joblib.dump(X_scaler, myscaler_filename)
 my_scaler = joblib.load(myscaler_filename)
 ```
 ## Team Predictor
+## HTML Code
+```html
+            <div class = "row">
+                <div class="col-md-2">
+                        <h3>Select Team first team:</h3>
+                        <form action="" method="post">
+                        <select name="teamOneDropDownSelect" id="teamOneDropDownSelect" onchange="team2Data(this.value)"> 
+                        </select>
+                        <h3>Select Team second team:</h3>
+                        <select name="teamTwoDropDownSelect" id="teamTwoDropDownSelect"> 
+                        </select>
+                        <br><br>
+                        <input id="team-versus-submit" type="submit" value="Submit">
+                        </form>
+                </div>
+                <div class="col-md-8">
+                        <div id="teamlogoOne"></div>
+                        <div id="resultsVersus"></div>
+                        <div id="teamlogoTwo"></div>
+                </div>
+            </div>
+```
+## Javascript
+```javascript
+$('#team-versus-submit').on('click', function(e){
+	e.preventDefault();
+	var team1 = $('select#teamOneDropDownSelect').val(),
+		team2 = $('select#teamTwoDropDownSelect').val();
+
+	//console.log(team1);
+	//console.log(team2);
+	var teamImage1 = '/static/logos/' + team1.toLowerCase() + '.gif';
+	var teamImage2 = '/static/logos/' + team2.toLowerCase() + '.gif';
+	
+	var logoImage = document.createElement("img");
+	logoImage.style.float = 'left';
+	logoImage.style.padding = '5px';
+	logoImage.setAttribute('src', teamImage1);
+	logoImage.setAttribute('alt', `${team1}`);
+	var logoImage2 = document.createElement("img");
+	logoImage2.style.padding = '5px';
+	//logoImage2.style.float = 'left';
+	logoImage2.setAttribute('src', teamImage2);
+	logoImage2.setAttribute('alt', `${team2}`);
+	var logoPic = document.getElementById("teamlogoOne");
+	logoPic.innerHTML = "";
+	logoPic.appendChild(logoImage);
+	logoPic = document.getElementById("teamlogoTwo");
+	logoPic.innerHTML = "";
+	logoPic.appendChild(logoImage2);
+
+	//console.log(start);
+	//     comments = $('textarea#comments').val(),
+	var formData = 'team1=' + team1 + '&team2=' + team2;
+  
+	 $.ajax({
+	   type: 'post',
+	   url: '/api/predict_team_vs_team',
+	   data: formData,
+	   success: function(results) {
+		 //console.log(results);
+		 var ff_result = `${team1} will lose to ${team2}`;
+		 var my_result = `${team1} will lose to ${team2}`;
+		 if(results['FourFactor'] == 'W') {
+			ff_result = `${team1} will win against ${team2}`;
+		 }
+		 if(results['MyModel'] == 'W') {
+			my_result = `${team1} will win against ${team2}`;
+		 }
+		  
+		 var model_results = new Array();
+		 model_results.push(["Model", "Predicted Result"]);
+		 model_results.push(["FourFactor", ff_result]);
+		 model_results.push(["MyModel", my_result]);
+		 //console.log(model_results);
+		 //Create a HTML Table element.
+		 var table = document.createElement("TABLE");
+		 table.style.float = 'left';
+		 table.border = "1";
+
+		 //Get the count of columns.
+		 var columnCount = model_results[0].length;
+	 
+		 //Add the header row.
+		 var row = table.insertRow(-1);
+		 for (var i = 0; i < columnCount; i++) {
+			var headerCell = document.createElement("TH");
+			headerCell.innerHTML = model_results[0][i];
+			row.appendChild(headerCell);
+		 }
+	 
+		 //Add the data rows.
+		 for (var i = 1; i < model_results.length; i++) {
+			row = table.insertRow(-1);
+			for (var j = 0; j < columnCount; j++) {
+				var cell = row.insertCell(-1);
+				cell.innerHTML = model_results[i][j];
+			}
+		 }
+	 
+		 var dvTable = document.getElementById("resultsVersus");
+		 dvTable.innerHTML = "";
+		 dvTable.appendChild(table);
+	   }
+	 });
+  });
+```
+## Python Code
 ```python
 @app.route("/api/predict_team_vs_team", methods=["POST"])
 def predictTeamVsTeam():
