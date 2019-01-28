@@ -9,13 +9,13 @@ async function getData(team){
 	//console.log(team);
 	var url = `/api/stats/${team}`;
 	teamStats = await d3.json(url).then(function(data) {
-	 	console.log(data);
+	 	//console.log(data);
 		// Build an array containing Customer records.
 		return(data);
 	});
-	
+	//console.log(teamStats);
 	var teamImage = '/static/logos/' + team.toLowerCase() + '.gif';
-	console.log(teamImage);
+	//console.log(teamImage);
 	var logoImage = document.createElement("img");
 	logoImage.setAttribute('src', teamImage);
 	logoImage.setAttribute('alt', `${team}`);
@@ -33,14 +33,16 @@ async function getStatData(stat){
 		x: ['W', 'L'],
 		y: [teamStats[1][statDisplay], teamStats[0][statDisplay]],
 		name: `${teamDisplay}`,
-		type: 'bar'
+		type: 'bar',
+		marker: {color: 'purple'}
 	};
 
 	var trace2 = {
 		x: ['W', 'L'],
 		y: [leagueStats[1][statDisplay], leagueStats[0][statDisplay]],
 		name: 'League',
-		type: 'bar'
+		type: 'bar',
+		marker: {color: 'blue'}
 	};
 
 	var data = [trace1, trace2];
@@ -86,7 +88,7 @@ async function initPage() {
 		// Build an array containing Customer records.
 		return (data);
 	});
-	console.log(leagueStats[0]);
+	//console.log(leagueStats[0]);
 	var statsHeader = Object.keys(leagueStats[0]);
 	statsHeader.remove('W/L')
 	select = document.getElementById("statDropDownSelect");
@@ -95,6 +97,5 @@ async function initPage() {
 		select.innerHTML += "<option value=\"" + data + "\">" + data + "</option>";
 	});
 	getData(teamDisplay);
-	getStatData(statDisplay);
 }
 initPage();

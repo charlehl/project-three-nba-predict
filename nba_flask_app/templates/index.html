@@ -8,11 +8,6 @@
   <meta name="description" content="Website to showcase final project for bootcamp.">
   <meta name="author" content="Charles Lee">
   <title>NBA Predict Index</title>
-  <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css"> -->
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" /> -->
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.3/css/bootstrap-select.min.css" /> -->
-  <!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" /> -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -21,169 +16,77 @@
 
   <!--   Navbar Linkes -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <!-- <script>window.jQuery || document.write('<script src="/static/js/jquery.min.js"><\/script>')</script>
-  <script src="/static/js/bootstrap.min.js"></script> -->
 
 </head>
 
 <body>
-    <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>                        
-            </button>
-            <a class="navbar-brand" href="/">NBA Predictor</a>
-          </div>
-          <div class="collapse navbar-collapse" id="myNavbar">
-            <ul class="nav navbar-nav">
-              <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Project <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                  <li><a href="/nbapredictor.html">NBA Team Record Predictor</a></li>
-                  <li><a href="/nbastats.html">NBA Stats</a></li>
-                </ul>
-                <li><a href="https://stats.nba.com/help/glossary/" target="_blank">NBA Glossary</a></li>
-              </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li><a href="https://github.com/charlehl/project-three-nba-predict" target="_blank"><span class="glyphicon glyphicon-folder-open"></span> Source Code</a></li>
-            </ul>
-          </div>
-        </div>
-      </nav>
- 
-    <!-- End of NAVBAR
-    ================================================== -->
+  {% include 'nav.html' %}
+  {% block content %}
+  {% endblock %}
   <div class="container-fluid">
 
-    <!-- Definr the index texts
+    <!-- Define the index texts
      ================================================== -->
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="text-align: center; color:black;">
-        <h1 class="featurette-heading">NBA Analytics Project</h1>
-        <!-- <ul class="nav-menu"></ul>
-        <li><a href="nbapredictor.html">Predict NBA Team Record</a></li>
-      </ul> -->
+        <h1 class="featurette-heading" style="color:blue;">NBA Analytics Project</h1>
       </div>
-      <div class="col-md-7" style="text-align: left; color:black;">
+      <div class="col-md-8" style="text-align: left; color:black;">
         <img src="/static/images/magic_87_finals.jpg" class="img-responsive" style="display: block;" alt="magic_87_finals">
+        <p style="text-align: center;">Game 4 of the 1987 NBA Finals: Magic Johnson "Junior Skyhook"</p>
         <br><br>
         <p>For my final project, I wanted to know what stats affect a basketball team's ability to win or lose a game.  
            Based upon my initial research, I found that Dean Oliver identified "Four Factors of Basketball Success".  
            He based this on shooting(40%), turnovers(25%), rebounding(20%) and free throws(15%).  The NBA measures 
            this using the stats eFG%, TOV%, OREB%, and FTRate respectively.  These factors can be expanded to the opposing 
-           team as well which is what the "fourfactor" model uses for it's model predictor features.</p>
+           team as well to give a more accurate prediction which is what the "fourfactor" model uses for it's model predictor 
+           features.</p>
         <P>I wanted to improve upon this model so I decided to use some of the four factors with additional parameters.  
            Recently, pace of play has become an emphasis in the NBA.  When I tried to use this in my, "mymodel" predictor, 
-           I found that the pace had little impact (low coefficient value) so I ended up creating my own custom features to 
-           improve my prediction. I decided to use offensive and defensive ratings.  I first calculated the average offensive 
-           and defensive ratings for teams in the past NBA season when they won a game.  Using this value, I created 
-           a new feature for offensive and defensive effectiveness.  This is seen in my "My Model" coefficient value 
-           of "OffEff" and "DefEff".  I also used TS% instead of eFG% which takes into account three point field goal 
-           percentage.  Based on these changes I was able to improve my model score from 0.9398(Four Factor Model) to 
-           0.9536(My Model).
+           I found that the pace had little impact (low coefficient value) so I ended up experimenting with other parameters. 
+           I eventually found that a team's defensive rating gave much better accuracy in predictions.  I also used TS% instead 
+           of eFG% which takes into account three point field goal percentage.  Based upon these changes I was able to improve 
+           my model score from 0.9398(Four Factor Model) to 0.9777(My Model).
         </p>
       </div>
       <div class="col-md-4" style="text-align: left; color:black;">
+          <h2>Logistical Regression Model (Sci-Kit Learn)</h2>
           <h3>Four Factor Model</h3>
-          <table>
-            <tr>
-              <th>Coefficient</th>
-              <th>Value</th>
-            </tr>
-            <tr>
-              <td>eFG%</td>
-              <td>4.91329346</td>
-            </tr>
-            <tr>
-                <td>FTARate</td>
-                <td>0.99873369</td>
-            </tr>
-            <tr>
-                <td>TOV%</td>
-                <td>-2.22702119</td>
-            </tr>
-            <tr>
-                <td>OREB%</td>
-                <td>2.01833405</td>
-            </tr>
-            <tr>
-                <td>OppFTARate</td>
-                <td>-0.99873369</td>
-            </tr>
-            <tr>
-                <td>OppREB%</td>
-                <td>-2.01833405</td>
-            </tr>
-            <tr>
-                <td>OppTOV%</td>
-                <td>2.22702119</td>
-            </tr>
-            <tr>
-                <td>OppFG%</td>
-                <td>-4.91329346</td>
-            </tr>
-          </table>
+          <div id="fourfactor_table"></div>
           <h3>My Model</h3>
-          <table>
-            <tr>
-              <th>Coefficient</th>
-              <th>Value</th>
-            </tr>
-            <tr>
-                <td>TS%</td>
-                <td>5.71346941</td>
-              </tr>
-              <tr>
-                <td>TOV%</td>
-                <td>-2.56418493</td>
-              </tr>
-              <tr>
-                <td>OREB%</td>
-                <td>2.38773285</td>
-              </tr>
-              <tr>
-                <td>OffEff</td>
-                <td>0.31699128</td>
-              </tr>
-              <tr>
-                <td>DefEff</td>
-                <td>0.85398057</td>
-              </tr>
-              <tr>
-                <td>OppFTARate</td>
-                <td>-1.06870842</td>
-              </tr>
-              <tr>
-                <td>OppOREB%</td>
-                <td>-2.1274397</td>
-              </tr>
-              <tr>
-                <td>OppTOV%</td>
-                <td>2.30208167</td>
-              </tr>
-              <tr>
-                <td>OppFG%</td>
-                <td>-5.16829403</td>
-              </tr>
-            </table>
+          <div id="mymodel_table"></div>
         </div>
     </div>
-    <br>
+    <div class="row">
+      <div class="col-md-2">
+        <h3>Tools for Project:</h3>
+        <dl>
+          <dt>Sci-Kit Learn:</dt>
+          <dd>- Logistical Regression Model</dd>
+          <dd>- StandardScalar</dd>
+          <dt>Python</dt>
+          <dd>- Pandas</dd>
+          <dd>- Flask</dd>
+          <dd>- Selenium</dd>
+          <dd>- BeautifulSoup</dd>
+          <dd>- Pymongo</dd>
+        </dl>
+      </div>
+      <div class="col-md-2">
+        <br><br><br>
+        <dt>HTML/CSS/Bootstrap</dt>
+        <dd>- Javascript Plotly</dt>
+        <dt>Database</dt>
+        <dd>- MongoDB</dd>
+      </div>
+    </div>
 
-</div>
+  </div>
   <!-- <div id="map"></div> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <!-- Leaflet JavaScript -->
-  <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css' rel='stylesheet' />
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
-
+  <script src="/static/js/index.js"></script>
 </body>
 
 </html>

@@ -1,7 +1,8 @@
 import os
 
 import pymongo
-import pandas as pd 
+import pandas as pd
+import numpy as np
 from pymongo import MongoClient
 # from flask_pymongo import PyMongo
 # import pprint
@@ -55,6 +56,16 @@ def nba_teams():
 	#print(temp[0]['Teams'])
 	return jsonify(temp[0]['Teams'])
 
+@app.route("/api/model_params")
+def getModelParams():
+	# Get model params
+	db = client.nba_data_db
+	temp = db.model_data.find()
+	temp = list(temp)
+	for i in temp:
+		i.pop('_id', None)
+	return jsonify(temp)
+
 @app.route("/api/predict/<team>")
 def predictTeamRecord(team):
 	ffscaler_filename = "./models/fourfactor_scaler.save"
@@ -79,7 +90,7 @@ def predictTeamRecord(team):
 	y = df['W/L']
 	ff_score = ff_model.score(X_ff_scaled, y)
 	ff_predictions = ff_model.predict(X_ff_scaled)
-	X_my = df.loc[:,['TS%', 'TOV%', 'OREB%', 'OffEff', 'DefEff', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
+	X_my = df.loc[:,['TS%', 'TOV%', 'OREB%', 'FTARate', 'DefRtg', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
 	X_my_scaled = my_scaler.transform(X_my)
 	my_score = my_model.score(X_my_scaled, y)
 	my_predictions = my_model.predict(X_my_scaled)
@@ -99,6 +110,54 @@ def predictTeamRecord(team):
 			'Actual' : [actualwincount, len(y)-actualwincount, 0]
 			}
 	return jsonify(results)
+
+@app.route("/api/predict_team_vs_team", methods=["POST"])
+def predictTeamVsTeam():
+	if request.method == "POST":
+		# Load models and scalers
+		ffscaler_filename = "./models/fourfactor_scaler.save"
+		myscaler_filename = "./models/my_scaler.save"
+		ffmodel_filename = "./models/fourfactor.pkl"
+		mymodel_filename = "./models/mymodel.pkl"
+		ff_scaler = joblib.load(ffscaler_filename)
+		my_scaler = joblib.load(myscaler_filename)
+		ff_model = pickle.load(open(ffmodel_filename, 'rb'))
+		my_model = pickle.load(open(mymodel_filename, 'rb'))
+		# Get teams to compare
+		team1 = request.form["team1"]
+		team2 = request.form["team2"]
+		# Pull current season data for both teams
+		db = client.nba_data_db
+		temp = db.testing_data.find({'$or' : [{'Team': team1}, {'Team': team2}]})
+		temp = list(temp)
+		for i in temp:
+			i.pop('_id', None)
+		df = pd.DataFrame(temp)
+		# Group by teams and calculate averages
+		result = df.groupby(['Team'])['TS%', 'eFG%', 'FTARate', 'TOV%', 'OREB%', 'DefRtg', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%'].mean()
+		# To compare team, replace Opp with team2
+		result.loc[team1,'OppFTARate'] = result.loc[team2,'FTARate']
+		result.loc[team1,'OppOREB%'] = result.loc[team2,'OREB%']
+		result.loc[team1,'OppTOV%'] = result.loc[team2,'TOV%']
+		result.loc[team1,'OppeFG%'] = result.loc[team2,'eFG%']
+		# Get proper index for predicted result, i.e. team1
+		index = result.index[0]
+		if index == team1:
+			team_index = 0
+		else:
+			team_index = 1
+		# Predict result
+		X_ff = result.loc[:,['eFG%', 'FTARate', 'TOV%', 'OREB%', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
+		X_ff_scaled = ff_scaler.transform(X_ff)
+		ff_predictions = ff_model.predict(X_ff_scaled)
+		X_my = result.loc[:,['TS%', 'TOV%', 'OREB%', 'FTARate', 'DefRtg', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
+		X_my_scaled = my_scaler.transform(X_my)
+		my_predictions = my_model.predict(X_my_scaled)
+		predict_results = {'FourFactor': ff_predictions[team_index],
+						   'MyModel' : my_predictions[team_index] 
+						  }
+		return jsonify(predict_results)
+	return render_template("nbapredictor.html")
 
 @app.route("/api/stats/<team>")
 def getTeamStats(team):
