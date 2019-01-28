@@ -108,6 +108,8 @@ df['eFG%'] = df['eFG%'].str.rstrip('%').astype('float')
 # change gamedate to datetime
 df['GameDate'] = df['GameDate'].apply(lambda x: dt.datetime.strptime(x, "%m/%d/%Y"))
 df = df.drop(['MIN', 'MatchUp', 'W/L', 'eFG%', 'OREB%', 'TOV%'], axis=1)
+###############################################################################################
+# Merge fourfactor and adv box stats
 result = pd.merge(new_df, df, on=['Team', 'GameDate'])
 # export to json
 items = result.to_json(orient='records', date_format='iso')
