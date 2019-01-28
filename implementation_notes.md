@@ -1,6 +1,39 @@
 # Implementation Notes for Project
+## FourFactor Machine Model
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+X = df.loc[:,['eFG%', 'FTARate', 'TOV%', 'OREB%', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
+y = df['W/L']
+fourfactor_model = LogisticRegression(verbose=1)
+X_scaler = StandardScaler().fit(X)
+X_train_scaled = X_scaler.transform(X)
+fourfactor_model.fit(X_train_scaled, y)
+fourfactor_model.coef_
+```
+## My Model Machine Model
+```python
+X = df.loc[:,['TS%', 'TOV%', 'OREB%', 'OffEff', 'DefEff', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%', 'PACE']]
+y = df['W/L']
+X_scaler = StandardScaler().fit(X)
+X_train_scaled = X_scaler.transform(X)
+my_model = LogisticRegression(C = .75, solver='liblinear', multi_class='ovr', penalty='l1', verbose=1)
+my_model.fit(X_train_scaled, y_train)
+my_model.coef_
+```
+## Trying to use SGD
+```python
+from sklearn.linear_model import SGDClassifier
+X = df_train.loc[:,['TS%', 'TOV%', 'OREB%', 'DefRtg', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
+y = df_train['W/L']
+mySGD_model = SGDClassifier(class_weight='balanced', loss="log", max_iter=1000, tol=1e-3, penalty="elasticnet")
+mySGD_model.fit(X, y)
+mySGD_model.coef_
+mySGD_model.score(X_train_scaled, y)
+```
 ## Saving/Loading machine models
 ```python
+import pickle
 # Saving
 mymodel_filename = 'mymodel.pkl'
 pickle.dump(newModel, open(mymodel_filename, 'wb'))
@@ -9,11 +42,79 @@ my_model = pickle.load(open(mymodel_filename, 'rb'))
 ```
 ## Saving/Loading Scalar
 ```python
+from sklearn.externals import joblib
 # Saving
 myscaler_filename = "my_scaler.save"
 joblib.dump(X_scaler, myscaler_filename)
 # Loading
 my_scaler = joblib.load(myscaler_filename)
+```
+## Scraping Training Data
+```python
+# create splinter browser
+def init_browser():
+    executable_path = {'executable_path': 'chromedriver.exe'}
+    browser = Browser('chrome', **executable_path, headless=False)
+    return browser
+browser = init_browser()
+nba_17_18_boxscores_url = "https://stats.nba.com/teams/boxscores-advanced/?Season=2017-18&SeasonType=Regular%20Season"
+nba_17_18_fourfactor_url = "https://stats.nba.com/teams/boxscores-four-factors/?Season=2017-18&SeasonType=Regular%20Season"
+# visit website
+browser.visit(nba_17_18_boxscores_url)
+time.sleep(3)
+# get click path by xpath from browser inspector
+sel_all_path = browser.find_by_xpath("/html/body/main/div[2]/div/div[2]/div/div/nba-stat-table/div[1]/div/div/select/option[1]")
+# select to display all games
+sel_all_path.click()
+time.sleep(5)
+# parse html in soup
+html = browser.html
+# Parse with soup
+soup = bs(html, 'html.parser')
+# Find all tables
+table = soup.find_all('table')[0] 
+df = pd.read_html(str(table))
+# drop season column since unneeded
+new_df = df[0].drop(columns=['Season'])
+# Rename column names
+new_df.rename(columns={"Game\xa0Date": "GameDate", "Match\xa0Up": "MatchUp"}, inplace=True)
+# change gamedate to datetime
+new_df['GameDate'] = new_df['GameDate'].apply(lambda x: dt.datetime.strptime(x, "%m/%d/%Y"))
+###############################################################################################
+# visit website
+browser.visit(nba_17_18_fourfactor_url)
+time.sleep(3)
+# get click path by xpath from browser inspector
+sel_all_path = browser.find_by_xpath("/html/body/main/div[2]/div/div[2]/div/div/nba-stat-table/div[1]/div/div/select/option[1]")
+# select to display all games
+sel_all_path.click()
+time.sleep(5)
+# parse html in soup
+html = browser.html
+# Parse with soup
+soup = bs(html, 'html.parser')
+# Find all tables
+table = soup.find_all('table')[0] 
+df = pd.read_html(str(table))
+# drop season column since unneeded
+df = df[0].drop(columns=['Season'])
+# Rename columns
+df.rename(columns={"Game\xa0Date": "GameDate", "Match\xa0Up": "MatchUp", "OppFTA\xa0Rate": "OppFTARate"}, inplace=True)
+# Convert to float percent values
+df['OREB%'] = df['OREB%'].str.rstrip('%').astype('float')
+df['OppOREB%'] = df['OppOREB%'].str.rstrip('%').astype('float')
+df['OppeFG%'] = df['OppeFG%'].str.rstrip('%').astype('float')
+df['eFG%'] = df['eFG%'].str.rstrip('%').astype('float')
+# change gamedate to datetime
+df['GameDate'] = df['GameDate'].apply(lambda x: dt.datetime.strptime(x, "%m/%d/%Y"))
+df = df.drop(['MIN', 'MatchUp', 'W/L', 'eFG%', 'OREB%', 'TOV%'], axis=1)
+result = pd.merge(new_df, df, on=['Team', 'GameDate'])
+# export to json
+items = result.to_json(orient='records', date_format='iso')
+# load json string to json
+items_db = json.loads(items)
+# insert data to collection
+db.testing_data.insert_many(items_db)
 ```
 ## Team Predictor
 ### HTML Code
