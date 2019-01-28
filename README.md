@@ -11,4 +11,13 @@ a particular game.
 
 # Directory structure:
 ### Exploratory
-Added ability to scrape data from nba.com for all boxscores for 2017-2018 NBA season in jupyter notebook
+Added ability to scrape data from nba.com for all boxscores for 2017-2018 NBA season in jupyter notebook and current season.
+Also added machine learning models creation and saving.
+Created backend db to store info and also stats info for web use.
+
+### db_backup
+Store my database backend data here.  Used later to upload to heroku app
+
+### nba_flask_app
+Flask app for final project.  App contains info on project.  predictor for nba current season records and head to head predictor.
+Also display stats comparison for visual view of data.
