@@ -187,5 +187,25 @@ def getNbaStats():
 	df = df.sort_values(['W/L'])
 	return df.to_json(orient='records')
 
+@app.route("/api/nbastats/histogram")
+def getNbaStatsHistogram():
+	db = client.nba_data_db
+	temp = db.training_data.find()
+	temp = list(temp)
+	for i in temp:
+		i.pop('_id', None)
+	df_train = pd.DataFrame(temp)
+	temp = db.testing_data.find()
+	temp = list(temp)
+	for i in temp:
+		i.pop('_id', None)
+	df_test = pd.DataFrame(temp)
+	df_train = df_train[['AST%', 'AST/TO', 'ASTRatio', 'DREB%', 'DefRtg', 'FTARate', 'OREB%', 'OffRtg', 'OppFTARate', 'OppOREB%',
+                     'OppTOV%', 'OppeFG%', 'PACE', 'PIE', 'REB%', 'TOV%', 'TS%', 'eFG%', 'Team']]
+	df_test = df_test[['AST%', 'AST/TO', 'ASTRatio', 'DREB%', 'DefRtg', 'FTARate', 'OREB%', 'OffRtg', 'OppFTARate', 'OppOREB%',
+                     'OppTOV%', 'OppeFG%', 'PACE', 'PIE', 'REB%', 'TOV%', 'TS%', 'eFG%', 'Team']]
+	df = pd.concat([df_train, df_test])
+	return df.to_json(orient='records')
+
 if __name__ == "__main__":
     app.run(debug=True)

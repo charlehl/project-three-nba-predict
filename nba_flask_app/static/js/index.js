@@ -66,9 +66,4 @@ function initPage() {
 	});
 }
 
-// Load navbar
-$(function(){
-	$("#navbar-placeholder").load("./templates/nav.html");
-});
-
 initPage();

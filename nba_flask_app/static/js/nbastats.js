@@ -1,7 +1,8 @@
 var leagueStats;
 var teamStats;
-var statDisplay = "eFG%";
+var statDisplay = "AST%";
 var teamDisplay = "ATL";
+var leagueGameData;
 
 //Function to read the data from the selection of user and call the API
 async function getData(team){
@@ -26,7 +27,7 @@ async function getData(team){
 	//console.log(teamStats);
 	getStatData(statDisplay);
 }
-async function getStatData(stat){
+function getStatData(stat){
 	statDisplay = stat;
 
 	var trace1 = {
@@ -42,7 +43,7 @@ async function getStatData(stat){
 		y: [leagueStats[1][statDisplay], leagueStats[0][statDisplay]],
 		name: 'League',
 		type: 'bar',
-		marker: {color: 'blue'}
+		marker: {color: 'gold'}
 	};
 
 	var data = [trace1, trace2];
@@ -50,10 +51,11 @@ async function getStatData(stat){
 	var layout = {
 		barmode: 'group',
 		title: `${stat}`,
-		xaxis: {title: 'Wins Vs. Losses'}
+		xaxis: {title: 'Mean Comparison Wins Vs. Losses'}
 	};
 
 	Plotly.newPlot('barchart', data, layout);
+	plotHistogram();
 }
 
 // Taken from stack overflow
@@ -67,6 +69,48 @@ Array.prototype.remove = function() {
     }
     return this;
 };
+
+function plotHistogram(){
+	//console.log(statDisplay);
+	//console.log(teamDisplay);
+
+	var leagueX = leagueGameData.map(function(value) {
+		return value[statDisplay];
+	});
+	//console.log(leagueX);
+	var teamX = leagueGameData.map(function(value) {
+		if(value['Team'] === teamDisplay) {
+			return value[statDisplay];
+		}
+		else {
+			return -1;
+		}
+	});
+	teamX.remove(-1);
+	//console.log(teamX);
+	
+	var trace1 = {
+	  x: teamX,
+	  name: `${teamDisplay}`,
+	  type: "histogram",
+	  opacity: 0.9,
+	  marker: {color: 'purple'}
+	};
+	var trace2 = {
+	  x: leagueX,
+	  name: 'League',
+	  type: "histogram",
+	  opacity: 0.3,
+	  marker: {color: 'gold'}
+	};
+	var data = [trace1, trace2];
+	var layout = {
+		//barmode: "stack",
+		barmode: "overlay",
+		title: `Histogram Plot ${statDisplay}`,
+	};
+	Plotly.newPlot('historgram', data, layout);
+}
 
 async function initPage() {
 	var url = "/nba/teams";
@@ -82,7 +126,12 @@ async function initPage() {
 		});
 	});
 
-	var url = "/api/nbastats";
+	url = "/api/nbastats/histogram";
+	leagueGameData = await d3.json(url).then(function(data) {
+		return data;
+	});
+
+	url = "/api/nbastats";
 	leagueStats = await d3.json(url).then(function(data) {
 	 	//console.log(data);
 		// Build an array containing Customer records.
@@ -97,5 +146,8 @@ async function initPage() {
 		select.innerHTML += "<option value=\"" + data + "\">" + data + "</option>";
 	});
 	getData(teamDisplay);
+
+	//console.log(leagueGameData);
+	//plotHistogram();
 }
 initPage();
