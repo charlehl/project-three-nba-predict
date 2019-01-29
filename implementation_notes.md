@@ -10,6 +10,8 @@ X_scaler = StandardScaler().fit(X)
 X_train_scaled = X_scaler.transform(X)
 fourfactor_model.fit(X_train_scaled, y)
 fourfactor_model.coef_
+fourfactor_model.score(X_train_scaled, y)
+# Score of 0.9398373983739837
 ```
 ## My Model Machine Model
 ```python
@@ -20,6 +22,8 @@ X_train_scaled = X_scaler.transform(X)
 my_model = LogisticRegression(C = .75, solver='liblinear', multi_class='ovr', penalty='l1', verbose=1)
 my_model.fit(X_train_scaled, y_train)
 my_model.coef_
+my_model.score(X_train_scaled, y_train)
+# Score of 0.9857723577235772
 ```
 ## Trying to use SGD
 ```python
@@ -30,6 +34,19 @@ mySGD_model = SGDClassifier(class_weight='balanced', loss="log", max_iter=1000, 
 mySGD_model.fit(X, y)
 mySGD_model.coef_
 mySGD_model.score(X_train_scaled, y)
+# Score of 0.967479674796748
+```
+## Trying Naive Bayes Gaussian
+```python
+from sklearn.naive_bayes import GaussianNB
+X_train = df_train.loc[:,['TS%', 'TOV%', 'OREB%', 'DefRtg', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
+y_train = df_train['W/L']
+X_scaler = StandardScaler().fit(X_train)
+X_train_scaled = X_scaler.transform(X_train)
+gNB_model = GaussianNB()
+gNB_model.fit(X_train_scaled, y_train)
+gNB_model.score(X_train_scaled, y_train)
+# Score of 0.8686991869918699
 ```
 ## Saving/Loading machine models
 ```python
