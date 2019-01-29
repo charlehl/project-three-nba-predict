@@ -292,6 +292,47 @@ def predictTeamVsTeam():
 		return jsonify(predict_results)
 	return render_template("nbapredictor.html")
 ```
+## Waiting for Async Data
+```javascript
+async function initPage() {
+	var url = "/nba/teams";
+	//var statsHeader = ['AST%', 'AST/TO', 'ASTRatio'];
+	d3.json(url).then(function(data) {
+		//console.log(data);
+	 	var select = document.getElementById("teamDropDownSelect");
+		select.innerHTML = "";
+		//select.innerHTML += "<option value=\"" + All + "\">" + All + "</option>"; 
+	 	data.forEach(data => {
+	 		//console.log(data)
+	 		select.innerHTML += "<option value=\"" + data + "\">" + data + "</option>";
+		});
+	});
+
+	url = "/api/nbastats/histogram";
+	leagueGameData = await d3.json(url).then(function(data) {
+		return data;
+	});
+
+	url = "/api/nbastats";
+	leagueStats = await d3.json(url).then(function(data) {
+	 	//console.log(data);
+		// Build an array containing Customer records.
+		return (data);
+	});
+	//console.log(leagueStats[0]);
+	var statsHeader = Object.keys(leagueStats[0]);
+	statsHeader.remove('W/L')
+	select = document.getElementById("statDropDownSelect");
+	select.innerHTML = "";
+	statsHeader.forEach(data => {
+		select.innerHTML += "<option value=\"" + data + "\">" + data + "</option>";
+	});
+	getData(teamDisplay);
+
+	//console.log(leagueGameData);
+	//plotHistogram();
+}
+```
 ## MongoDB
 ### Mongo save
     mongodump -h localhost:27017 -d nba_data_db -o db_backup
