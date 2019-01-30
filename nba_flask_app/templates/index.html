@@ -41,18 +41,19 @@
            this using the stats eFG%, TOV%, OREB%, and FTRate respectively.  These factors can be expanded to the opposing 
            team as well to give a more accurate prediction which is what the "fourfactor" model uses for it's model predictor 
            features.</p>
-        <P>I wanted to improve upon this model so I decided to use some of the four factors with additional parameters.  
-           Recently, pace of play has become an emphasis in the NBA.  When I tried to use this in my, "mymodel" predictor, 
-           I found that the pace had little impact (low coefficient value) so I ended up experimenting with other parameters. 
-           I eventually found that a team's defensive rating gave much better accuracy in predictions.  I also used TS% instead 
-           of eFG% which takes into account three point field goal percentage.  Based upon these changes I was able to improve 
-           my model score from 0.9398(Four Factor Model) to 0.9777(My Model).
+        <P>Although my initial model was incredibly accurate, I wanted to improve upon this model so I decided to use some of 
+           the four factors with additional parameters. Recently, pace of play has become an emphasis in the NBA.  When I tried 
+           to use this in my, "mymodel" predictor, I found that the pace had little impact (low coefficient value) so I ended up 
+           experimenting with other parameters.  I eventually found that a team's defensive rating gave much better accuracy in 
+           predictions.  I also used TS% instead of eFG% which takes into account three point field goal percentage.  Based upon 
+           these changes I was able to improve my model score from 0.9351(Four Factor Model) to 0.9775(My Model).
         </p>
       </div>
       <div class="col-md-4" style="text-align: left; color:black;">
           <h2>Logistical Regression Model (Sci-Kit Learn)</h2>
           <h3>Four Factor Model</h3>
           <div id="fourfactor_table"></div>
+          <h2>SGD Classifier Model (Sci-Kit Learn)</h2>
           <h3>My Model</h3>
           <div id="mymodel_table"></div>
         </div>
