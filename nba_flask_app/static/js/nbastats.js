@@ -54,7 +54,7 @@ function getStatData(stat){
 		xaxis: {title: 'Mean Comparison Wins Vs. Losses'}
 	};
 
-	Plotly.newPlot('barchart', data, layout);
+	Plotly.newPlot('barchart', data, layout, {responsive: true});
 	plotHistogram();
 }
 
@@ -109,7 +109,7 @@ function plotHistogram(){
 		barmode: "overlay",
 		title: `Histogram Plot ${statDisplay}`,
 	};
-	Plotly.newPlot('historgram', data, layout);
+	Plotly.newPlot('historgram', data, layout, {responsive: true});
 }
 
 async function initPage() {
