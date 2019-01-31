@@ -131,6 +131,14 @@ async function initPage() {
 	team2Select = 'BKN';
 	getData('ATL');
 	team2Data('ATL');
+	url = '/api/get_db_lastupdate';
+	d3.json(url).then(data => {
+		console.log(data);
+		var updateTag = document.createElement("h6");
+		var t = document.createTextNode("Updated for games played through " + data['date'] + ".");
+		updateTag.appendChild(t);
+		document.getElementById("lastupdate").appendChild(updateTag);
+	});
 }
 
 // Monitor submit button

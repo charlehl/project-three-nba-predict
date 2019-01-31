@@ -22,6 +22,7 @@ from sklearn.externals import joblib
 #from sklearn.model_selection import train_test_split
 #from sklearn.preprocessing import StandardScaler
 import pickle
+import dateutil.parser
 
 app = Flask(__name__)
 
@@ -65,6 +66,15 @@ def getModelParams():
 	for i in temp:
 		i.pop('_id', None)
 	return jsonify(temp)
+
+@app.route("/api/get_db_lastupdate")
+def getDbLastUpdate():
+	db = client.nba_data_db
+	temp = db.testing_data.find().sort('GameDate',pymongo.DESCENDING).limit(1)
+	date_index = temp[0]['GameDate']
+	last_date = dateutil.parser.parse(date_index)
+	last_date = last_date.strftime('%m/%d/%Y')
+	return jsonify({'date': last_date})
 
 @app.route("/api/predict/<team>")
 def predictTeamRecord(team):
