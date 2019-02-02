@@ -25,7 +25,80 @@ async function getData(team){
 	logoPic.appendChild(logoImage);
 
 	//console.log(teamStats);
+	displayStats();
 	getStatData(statDisplay);
+}
+// Taken from stack overflow
+Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
+function displayStats() {
+	//console.log(teamStats);
+	var stats = Object.keys(teamStats[0]);
+	stats.remove('W/L');
+	//console.log(stats);
+	var team_stats = new Array();
+	var temp = [teamDisplay];
+	team_stats.push(temp.concat(stats));
+	// Extract values from each key for wins and losses
+	Object.keys(teamStats);
+	var statArrayLoss = Object.keys(teamStats[0]).map(function(key) {
+		if(key != 'W/L') {
+			return teamStats[0][key];
+		}
+		else {
+			return "-1";
+		}
+	});
+	var statArrayWin = Object.keys(teamStats[1]).map(function(key) {
+		if(key != 'W/L') {
+			return teamStats[1][key];
+		}
+		else {
+			return "-1";
+		}
+	});
+	statArrayLoss.remove("-1");
+	statArrayWin.remove("-1");
+	temp = ["Win"];
+	team_stats.push(temp.concat(statArrayWin));
+	temp = ["Loss"];
+	team_stats.push(temp.concat(statArrayLoss));
+
+	//Create a HTML Table element.
+	var table = document.createElement("TABLE");
+	table.border = "1";
+	
+	//Get the count of columns.
+	var columnCount = team_stats[0].length;
+	
+	//Add the header row.
+	var row = table.insertRow(-1);
+	for (var i = 0; i < columnCount; i++) {
+		var headerCell = document.createElement("TH");
+		headerCell.innerHTML = team_stats[0][i];
+		row.appendChild(headerCell);
+	}
+	
+	//Add the data rows.
+	for (var i = 1; i < team_stats.length; i++) {
+		row = table.insertRow(-1);
+		for (var j = 0; j < columnCount; j++) {
+			var cell = row.insertCell(-1);
+			cell.innerHTML = team_stats[i][j];
+		}
+	}
+	 
+	var dvTable = document.getElementById("teamtable");
+	dvTable.innerHTML = "";
+	dvTable.appendChild(table);
 }
 function getStatData(stat){
 	statDisplay = stat;
