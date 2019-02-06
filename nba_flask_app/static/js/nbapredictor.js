@@ -108,48 +108,11 @@ function team2Data(team){
 		}
 	});
 }
-async function initPage() {
-	var url = "/nba/teams";
-	teamNames = await d3.json(url).then(function(data) {
-		//console.log(data);
-		var select = document.getElementById("teamDropDownSelect");
-		var select2 = document.getElementById("teamOneDropDownSelect");
-		select.innerHTML = "";
-		select2.innerHTML = "";
-	 	data.forEach(data => {
-	 		//console.log(data)
-			select.innerHTML += "<option value=\"" + data + "\">" + data + "</option>";
-			select2.innerHTML += "<option value=\"" + data + "\">" + data + "</option>";
-		});
-	// 	console.log("Hi");
-	// 	//initData();
-	// 	//buildLiveStatus(data.features[0].kioskId);
-		return (data);
-	});
-	//console.log(teamNames);
-	team1Select = 'ATL';
-	team2Select = 'BKN';
-	getData('ATL');
-	team2Data('ATL');
-	url = '/api/get_db_lastupdate';
-	d3.json(url).then(data => {
-		console.log(data);
-		var updateTag = document.createElement("h6");
-		var t = document.createTextNode("Updated for games played through " + data['date'] + ".");
-		updateTag.appendChild(t);
-		document.getElementById("lastupdate").appendChild(updateTag);
-	});
-}
 
-// Monitor submit button
-$('#team-versus-submit').on('click', function(e){
-	e.preventDefault();
-	//console.log("Why");
-	var team1 = $('select#teamOneDropDownSelect').val(),
-		team2 = $('select#teamTwoDropDownSelect').val();
+function predictScore(homeTeam, roadTeam){
+	var team1 = homeTeam;
+	var team2 = roadTeam;
 
-	//console.log(team1);
-	//console.log(team2);
 	var teamImage1 = '/static/logos/' + team1.toLowerCase() + '.gif';
 	var teamImage2 = '/static/logos/' + team2.toLowerCase() + '.gif';
 	
@@ -169,30 +132,22 @@ $('#team-versus-submit').on('click', function(e){
 	logoPic = document.getElementById("teamlogoTwo");
 	logoPic.innerHTML = "";
 	logoPic.appendChild(logoImage2);
-
-	//console.log(start);
-	//     comments = $('textarea#comments').val(),
+	
 	var formData = 'team1=' + team1 + '&team2=' + team2;
   
-	 $.ajax({
+	$.ajax({
 	   type: 'post',
 	   url: '/api/predict_team_vs_team',
 	   data: formData,
 	   success: function(results) {
 		 //console.log(results);
-		 var ff_result = `${team1} will lose to ${team2}`;
-		 var my_result = `${team1} will lose to ${team2}`;
-		 if(results['FourFactor'] == 'W') {
-			ff_result = `${team1} will win against ${team2}`;
-		 }
-		 if(results['MyModel'] == 'W') {
-			my_result = `${team1} will win against ${team2}`;
-		 }
+		 var home_result = Math.round(results[team1]);
+		 var road_result = Math.round(results[team2]);
 		  
 		 var model_results = new Array();
-		 model_results.push(["Model", "Predicted Result"]);
-		 model_results.push(["FourFactor", ff_result]);
-		 model_results.push(["MyModel", my_result]);
+		 model_results.push(["Game", "Team", "Predicted Score"]);
+		 model_results.push(["Home", team1, home_result]);
+		 model_results.push(["Road", team2, road_result]);
 		 //console.log(model_results);
 		 //Create a HTML Table element.
 		 var table = document.createElement("TABLE");
@@ -224,6 +179,52 @@ $('#team-versus-submit').on('click', function(e){
 		 dvTable.appendChild(table);
 	   }
 	 });
+}
+async function initPage() {
+	var url = "/nba/teams";
+	teamNames = await d3.json(url).then(function(data) {
+		//console.log(data);
+		var select = document.getElementById("teamDropDownSelect");
+		var select2 = document.getElementById("teamOneDropDownSelect");
+		select.innerHTML = "";
+		select2.innerHTML = "";
+	 	data.forEach(data => {
+	 		//console.log(data)
+			select.innerHTML += "<option value=\"" + data + "\">" + data + "</option>";
+			select2.innerHTML += "<option value=\"" + data + "\">" + data + "</option>";
+		});
+	// 	console.log("Hi");
+	// 	//initData();
+	// 	//buildLiveStatus(data.features[0].kioskId);
+		return (data);
+	});
+	//console.log(teamNames);
+	team1Select = 'ATL';
+	team2Select = 'BKN';
+	getData('ATL');
+	team2Data('ATL');
+	url = '/api/get_db_lastupdate';
+	d3.json(url).then(data => {
+		//console.log(data);
+		var updateTag = document.createElement("h6");
+		var t = document.createTextNode("Updated for games played through " + data['date'] + ".");
+		updateTag.appendChild(t);
+		document.getElementById("lastupdate").appendChild(updateTag);
+	});
+	predictScore(team1Select, team2Select);
+}
+
+// Monitor submit button
+$('#team-versus-submit').on('click', function(e){
+	e.preventDefault();
+	//console.log("Why");
+	var team1 = $('select#teamOneDropDownSelect').val(),
+		team2 = $('select#teamTwoDropDownSelect').val();
+
+	//console.log(team1);
+	//console.log(team2);
+
+	predictScore(team1, team2);
   });
 
   initPage();

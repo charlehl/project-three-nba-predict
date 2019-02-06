@@ -5,6 +5,11 @@ html, body {
   /* margin: 1% */
 }
 
+body {
+  /* background-image: url("paper.gif"); */
+  background-color: #1b7bd4;
+ }
+
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;

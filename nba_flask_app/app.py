@@ -121,50 +121,43 @@ def predictTeamRecord(team):
 			}
 	return jsonify(results)
 
+def getHomeRoadMeans(teamHome, teamRoad):
+	db = client.nba_data_db
+	temp = db.score_pred_testing_data.find({'$or' : [{'HomeTeam': teamHome}, {'RoadTeam': teamRoad}]})
+	temp = list(temp)
+	for i in temp:
+		i.pop('_id', None)
+	df_test = pd.DataFrame(temp)
+	df_test = df_test.sort_values(['GameDate'], ascending=0).reset_index(drop=True)
+	home_df = df_test[df_test['HomeTeam'] == teamHome].reset_index(drop=True)
+	road_df = df_test[df_test['RoadTeam'] == teamRoad].reset_index(drop=True)
+	homeMean = home_df[0:5].mean()
+	roadMean = road_df[0:5].mean()
+	test_series = pd.Series(data = [homeMean['PIE_h'], homeMean['FTARate_h'], homeMean['REB%_h'], homeMean['TOV%_h'], homeMean['TS%_h'], homeMean['PACE_h'], homeMean['ELO_h'],
+									roadMean['PIE_r'], roadMean['FTARate_r'], roadMean['REB%_r'], roadMean['TOV%_r'], roadMean['TS%_r'], roadMean['PACE_r'], roadMean['ELO_r']
+	])
+	test_data = test_series.values.reshape(1,14)
+	return test_data
+
 @app.route("/api/predict_team_vs_team", methods=["POST"])
 def predictTeamVsTeam():
 	if request.method == "POST":
 		# Load models and scalers
-		ffscaler_filename = "./models/fourfactor_scaler.save"
-		myscaler_filename = "./models/my_scaler.save"
-		ffmodel_filename = "./models/fourfactor.pkl"
-		mymodel_filename = "./models/mymodel.pkl"
-		ff_scaler = joblib.load(ffscaler_filename)
-		my_scaler = joblib.load(myscaler_filename)
-		ff_model = pickle.load(open(ffmodel_filename, 'rb'))
-		my_model = pickle.load(open(mymodel_filename, 'rb'))
+		bayScalar_filename = "./models/bay_rig_scaler.save"
+		bayHome_filename = "./models/bay_rig_home_model.pkl"
+		bayRoad_filename = "./models/bay_rig_road_model.pkl"
+		bay_rig_scaler = joblib.load(bayScalar_filename)
+		bayHome_model = pickle.load(open(bayHome_filename, 'rb'))
+		bayRoad_model = pickle.load(open(bayRoad_filename, 'rb'))
 		# Get teams to compare
 		team1 = request.form["team1"]
 		team2 = request.form["team2"]
 		# Pull current season data for both teams
-		db = client.nba_data_db
-		temp = db.testing_data.find({'$or' : [{'Team': team1}, {'Team': team2}]})
-		temp = list(temp)
-		for i in temp:
-			i.pop('_id', None)
-		df = pd.DataFrame(temp)
-		# Group by teams and calculate averages
-		result = df.groupby(['Team'])['TS%', 'eFG%', 'FTARate', 'TOV%', 'OREB%', 'DefRtg', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%'].mean()
-		# To compare team, replace Opp with team2
-		result.loc[team1,'OppFTARate'] = result.loc[team2,'FTARate']
-		result.loc[team1,'OppOREB%'] = result.loc[team2,'OREB%']
-		result.loc[team1,'OppTOV%'] = result.loc[team2,'TOV%']
-		result.loc[team1,'OppeFG%'] = result.loc[team2,'eFG%']
-		# Get proper index for predicted result, i.e. team1
-		index = result.index[0]
-		if index == team1:
-			team_index = 0
-		else:
-			team_index = 1
-		# Predict result
-		X_ff = result.loc[:,['eFG%', 'FTARate', 'TOV%', 'OREB%', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
-		X_ff_scaled = ff_scaler.transform(X_ff)
-		ff_predictions = ff_model.predict(X_ff_scaled)
-		X_my = result.loc[:,['TS%', 'TOV%', 'OREB%', 'FTARate', 'DefRtg', 'OppFTARate', 'OppOREB%', 'OppTOV%', 'OppeFG%']]
-		X_my_scaled = my_scaler.transform(X_my)
-		my_predictions = my_model.predict(X_my_scaled)
-		predict_results = {'FourFactor': ff_predictions[team_index],
-						   'MyModel' : my_predictions[team_index] 
+		X_test = getHomeRoadMeans(team1, team2)
+		X_test_scaled = bay_rig_scaler.transform(X_test)
+		
+		predict_results = {team1: bayHome_model.predict(X_test_scaled)[0],
+						   team2 : bayRoad_model.predict(X_test_scaled)[0] 
 						  }
 		return jsonify(predict_results)
 	return render_template("nbapredictor.html")
