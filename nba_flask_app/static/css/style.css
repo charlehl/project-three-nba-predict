@@ -7,7 +7,7 @@ html, body {
 
 body {
   /* background-image: url("paper.gif"); */
-  background-color: #1b7bd4;
+  /* background-color: #1b7bd4; */
  }
 
 table, th, td {
@@ -26,8 +26,8 @@ th, td {
   top: 0;
   }
 
-/* tr:nth-child(even) {background-color: #f2f2f2;} */
-hr { 
+
+  hr { 
   display: block;
   margin-top: 0.5em;
   margin-bottom: 0.5em;
@@ -44,6 +44,15 @@ hr {
   }
 }
 
+th {background-color: #85878a;}
+tr:nth-child(even) {background-color: #1186b4;}
+tr:nth-child(odd) {background-color: #ced122;}
+
+.resultTable {
+  display: block;
+  margin-top: 100px;
+  margin-left: 30px;
+}
 .row {
   display: flex;
   flex-wrap: wrap;

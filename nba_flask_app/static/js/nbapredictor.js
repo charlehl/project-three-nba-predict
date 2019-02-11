@@ -123,7 +123,7 @@ function predictScore(homeTeam, roadTeam){
 	logoImage.setAttribute('alt', `${team1}`);
 	var logoImage2 = document.createElement("img");
 	logoImage2.style.padding = '5px';
-	//logoImage2.style.float = 'left';
+	logoImage2.style.float = 'clear';
 	logoImage2.setAttribute('src', teamImage2);
 	logoImage2.setAttribute('alt', `${team2}`);
 	var logoPic = document.getElementById("teamlogoOne");
@@ -132,7 +132,7 @@ function predictScore(homeTeam, roadTeam){
 	logoPic = document.getElementById("teamlogoTwo");
 	logoPic.innerHTML = "";
 	logoPic.appendChild(logoImage2);
-	
+
 	var formData = 'team1=' + team1 + '&team2=' + team2;
   
 	$.ajax({
@@ -140,19 +140,35 @@ function predictScore(homeTeam, roadTeam){
 	   url: '/api/predict_team_vs_team',
 	   data: formData,
 	   success: function(results) {
-		 //console.log(results);
-		 var home_result = Math.round(results[team1]);
-		 var road_result = Math.round(results[team2]);
-		  
-		 var model_results = new Array();
-		 model_results.push(["Game", "Team", "Predicted Score"]);
-		 model_results.push(["Home", team1, home_result]);
-		 model_results.push(["Road", team2, road_result]);
-		 //console.log(model_results);
-		 //Create a HTML Table element.
+		 console.log(results);
+		 var modelOrder = ['BayRidgeRegress', 'ArdRegress', 'HuberRegress', 'SgdRegress', 'TheilSenRegress', 'RansacRegress', 'modelMean'];
+		 var homeScores = [];
+		 var roadScores = [];
+		 Object.keys(results)
+		 					 .sort(function modelSort(a,b) {
+								  return modelOrder.indexOf(a) > modelOrder.indexOf(b);
+							  })
+							 .forEach(function (v,i){
+								homeScores.push(Math.round(results[v][1]));
+								roadScores.push(Math.round(results[v][0]));
+							 });
+		 
+		 
+		 //console.log(homeScores);
+		 //var modelNames = Object.keys(resultsOrdered);
+		 //console.log(modelNames);
 		 var table = document.createElement("TABLE");
 		 table.style.float = 'left';
 		 table.border = "1";
+
+		 var header = ["Game Type", "Team"];
+		 var home_result = ["Home", team1];
+		 var road_result = ["Road", team2];
+		  
+		 var model_results = new Array();
+		 model_results.push(header.concat(modelOrder));
+		 model_results.push(road_result.concat(roadScores));
+		 model_results.push(home_result.concat(homeScores));
 
 		 //Get the count of columns.
 		 var columnCount = model_results[0].length;

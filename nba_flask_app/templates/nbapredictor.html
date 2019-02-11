@@ -16,20 +16,34 @@
         {% endblock %}
         <div class="container-fluid">
             <div class="row">
-            <div class="col-md-12" style="text-align: center; color:blue;">
-                <h1>NBA Team Record Predictor</h1>
-            </div>
-            </div>
-            <div class="row">
-                <div class="col-md-2">
-                    <h3>Select Team to predict:</h3>
-                    <select name="teamDropDownSelect" id="teamDropDownSelect" onchange="getData(this.value)"> 
-                    </select>
-                    <div id="lastupdate"></div>
+                <div class="col-md-12" style="text-align: center; color:black;">
+                    <h1>NBA Team Head-to-Head Predictor</h1>
+                    <br><br>
                 </div>
-                <div class="col-md-3">
-                    <div id="teamlogo"></div>
-                    <div id="results"></div>
+            </div>
+            <div class = "row">
+                <div class="col-md-2">
+                    <h3>Select Home Team:</h3>
+                    <form action="" method="post">
+                    <select name="teamOneDropDownSelect" id="teamOneDropDownSelect" onchange="team2Data(this.value)"> 
+                    </select>
+                    <h3>Select Road Team:</h3>
+                    <select name="teamTwoDropDownSelect" id="teamTwoDropDownSelect"> 
+                    </select>
+                    <br><br><br>
+                    <input id="team-versus-submit" type="submit" value="Predict">
+                    </form>
+                </div>
+                <div class="col-md-1">
+                    <br>
+                    <div id="teamlogoTwo"></div>
+                    <br>
+                    <P>&emsp;&emsp;&emsp;&emsp;&emsp;vs</p>
+                    <div id="teamlogoOne"></div>
+                    <br>
+                </div>
+                <div class="col-md-8">
+                    <div class="resultTable" id="resultsVersus"></div>
                 </div>
             </div>
             <br><br>
@@ -37,29 +51,21 @@
                 <div class="col-md-12" style="text-align: center; color:black;">
                     <hr>
                     <br><br>
-                    <h1>NBA Team Head-to-Head Predictor</h1>
-                    <br><br>
+                    <h1>NBA Team Record Predictor</h1>
                 </div>
-            </div>
-            <div class = "row">
-                <div class="col-md-2">
-                        <h3>Select Home Team:</h3>
-                        <form action="" method="post">
-                        <select name="teamOneDropDownSelect" id="teamOneDropDownSelect" onchange="team2Data(this.value)"> 
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <h3>Select Team to predict:</h3>
+                        <select name="teamDropDownSelect" id="teamDropDownSelect" onchange="getData(this.value)"> 
                         </select>
-                        <h3>Select Road Team:</h3>
-                        <select name="teamTwoDropDownSelect" id="teamTwoDropDownSelect"> 
-                        </select>
-                        <br><br>
-                        <input id="team-versus-submit" type="submit" value="Submit">
-                        </form>
+                        <div id="lastupdate"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div id="teamlogo"></div>
+                        <div id="results"></div>
+                    </div>
                 </div>
-                <div class="col-md-8">
-                        <div id="teamlogoOne"></div>
-                        <div id="resultsVersus"></div>
-                        <div id="teamlogoTwo"></div>
-                </div>
-            </div>
         </div>
 
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>

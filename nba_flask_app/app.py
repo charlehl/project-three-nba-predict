@@ -19,8 +19,6 @@ from flask_cors import CORS, cross_origin
 import json
 import requests
 from sklearn.externals import joblib
-#from sklearn.model_selection import train_test_split
-#from sklearn.preprocessing import StandardScaler
 import pickle
 import dateutil.parser
 
@@ -121,8 +119,10 @@ def predictTeamRecord(team):
 			}
 	return jsonify(results)
 
-def getHomeRoadMeans(teamHome, teamRoad):
+def getHomeRoadMeans(teamRoad, teamHome):
 	db = client.nba_data_db
+	scoreScaler_filename = "./models/score_scaler.save"
+	X_scaler = joblib.load(scoreScaler_filename)
 	temp = db.score_pred_testing_data.find({'$or' : [{'HomeTeam': teamHome}, {'RoadTeam': teamRoad}]})
 	temp = list(temp)
 	for i in temp:
@@ -133,32 +133,85 @@ def getHomeRoadMeans(teamHome, teamRoad):
 	road_df = df_test[df_test['RoadTeam'] == teamRoad].reset_index(drop=True)
 	homeMean = home_df[0:5].mean()
 	roadMean = road_df[0:5].mean()
-	test_series = pd.Series(data = [homeMean['PIE_h'], homeMean['FTARate_h'], homeMean['REB%_h'], homeMean['TOV%_h'], homeMean['TS%_h'], homeMean['PACE_h'], homeMean['ELO_h'],
-									roadMean['PIE_r'], roadMean['FTARate_r'], roadMean['REB%_r'], roadMean['TOV%_r'], roadMean['TS%_r'], roadMean['PACE_r'], roadMean['ELO_r']
+	test_series = pd.Series(data = [homeMean['DefRtg_h'], homeMean['PIE_h'], homeMean['FTARate_h'], homeMean['REB%_h'], homeMean['TOV%_h'], homeMean['TS%_h'], homeMean['PACE_h'], homeMean['ELO_h'],
+									roadMean['DefRtg_r'], roadMean['PIE_r'], roadMean['FTARate_r'], roadMean['REB%_r'], roadMean['TOV%_r'], roadMean['TS%_r'], roadMean['PACE_r'], roadMean['ELO_r']
 	])
-	test_data = test_series.values.reshape(1,14)
-	return test_data
+	test_data = test_series.values.reshape(1,16)
+	return X_scaler.transform(test_data)
+
+def predictAllModels(testData):
+	# Load models
+	bayHome_filename = "./models/bay_rig_home_model.pkl"
+	bayRoad_filename = "./models/bay_rig_road_model.pkl"
+	ardHome_filename = "./models/ard_home_model.pkl"
+	ardRoad_filename = "./models/ard_road_model.pkl"
+	huberHome_filename = "./models/huber_home_model.pkl"
+	huberRoad_filename = "./models/huber_road_model.pkl"
+	sgdHome_filename = "./models/sgd_home_model.pkl"
+	sgdRoad_filename = "./models/sgd_road_model.pkl"
+	theilHome_filename = "./models/theil_sen_home_model.pkl"
+	theilRoad_filename = "./models/theil_sen_road_model.pkl"
+	ransacHome_filename = "./models/ransac_home_model.pkl"
+	ransacRoad_filename = "./models/ransac_road_model.pkl"
+
+	bayHome_model = pickle.load(open(bayHome_filename, 'rb'))
+	bayRoad_model = pickle.load(open(bayRoad_filename, 'rb'))
+	ardHome_model = pickle.load(open(ardHome_filename, 'rb'))
+	ardRoad_model = pickle.load(open(ardRoad_filename, 'rb'))
+	huberHome_model = pickle.load(open(huberHome_filename, 'rb'))
+	huberRoad_model = pickle.load(open(huberRoad_filename, 'rb'))
+	sgdHome_model = pickle.load(open(sgdHome_filename, 'rb'))
+	sgdRoad_model = pickle.load(open(sgdRoad_filename, 'rb'))
+	theilHome_model = pickle.load(open(theilHome_filename, 'rb'))
+	theilRoad_model = pickle.load(open(theilRoad_filename, 'rb'))
+	ransacHome_model = pickle.load(open(ransacHome_filename, 'rb'))
+	ransacRoad_model = pickle.load(open(ransacRoad_filename, 'rb'))
+
+	predVals = {}
+
+	# Baysian Ridge Model
+	temp = [bayRoad_model.predict(testData)[0], bayHome_model.predict(testData)[0]]
+	mean = [temp[0], temp[1]]
+	predVals['BayRidgeRegress'] = temp
+	#ARD Regressor
+	temp = [ardRoad_model.predict(testData)[0], ardHome_model.predict(testData)[0]]
+	mean[0] += temp[0]
+	mean[1] += temp[1]
+	predVals['ArdRegress'] = temp
+	# Huber Loss
+	temp = [huberRoad_model.predict(testData)[0], huberHome_model.predict(testData)[0]]
+	mean[0] += temp[0]
+	mean[1] += temp[1]
+	predVals['HuberRegress'] = temp
+	# SGD with 
+	temp = [sgdRoad_model.predict(testData)[0], sgdHome_model.predict(testData)[0]]
+	mean[0] += temp[0]
+	mean[1] += temp[1]
+	predVals['SgdRegress'] = temp
+	# Theil-Sen handles more robust than LSE, less sensitive to outliers
+	temp = [theilRoad_model.predict(testData)[0], theilHome_model.predict(testData)[0]]
+	mean[0] += temp[0]
+	mean[1] += temp[1]
+	predVals['TheilSenRegress'] = temp
+	# Deals better with large outliers in y
+	temp = [ransacRoad_model.predict(testData)[0], ransacHome_model.predict(testData)[0]]
+	mean[0] += temp[0]
+	mean[1] += temp[1]
+	predVals['RansacRegress'] = temp    
+		
+	predVals['modelMean'] = [mean[0]/len(predVals), mean[1]/len(predVals)]
+	return predVals
 
 @app.route("/api/predict_team_vs_team", methods=["POST"])
 def predictTeamVsTeam():
 	if request.method == "POST":
-		# Load models and scalers
-		bayScalar_filename = "./models/bay_rig_scaler.save"
-		bayHome_filename = "./models/bay_rig_home_model.pkl"
-		bayRoad_filename = "./models/bay_rig_road_model.pkl"
-		bay_rig_scaler = joblib.load(bayScalar_filename)
-		bayHome_model = pickle.load(open(bayHome_filename, 'rb'))
-		bayRoad_model = pickle.load(open(bayRoad_filename, 'rb'))
 		# Get teams to compare
-		team1 = request.form["team1"]
-		team2 = request.form["team2"]
+		teamHome = request.form["team1"]
+		teamRoad = request.form["team2"]
 		# Pull current season data for both teams
-		X_test = getHomeRoadMeans(team1, team2)
-		X_test_scaled = bay_rig_scaler.transform(X_test)
-		
-		predict_results = {team1: bayHome_model.predict(X_test_scaled)[0],
-						   team2 : bayRoad_model.predict(X_test_scaled)[0] 
-						  }
+		data = getHomeRoadMeans(teamRoad, teamHome)
+		predict_results = predictAllModels(data)
+
 		return jsonify(predict_results)
 	return render_template("nbapredictor.html")
 
