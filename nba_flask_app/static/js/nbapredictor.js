@@ -247,9 +247,6 @@ async function initPage() {
 		var odds_results = new Array();
 		odds_results.push(["Home Team", "Point Spread(Home Team)", "Road Team"]);
 		
-		data['homeTeam'].forEach(team => {
-			console.log(team);
-		});
 		data['homeTeam'].forEach((team, index) => {
 			odds_results.push([data['homeTeam'][index], data['pointSpread'][index], data['roadTeam'][index]]);
 		});
