@@ -109,6 +109,10 @@ function team2Data(team){
 	});
 }
 
+// function round(value, decimals) {
+// 	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+// }
+  
 function predictScore(homeTeam, roadTeam){
 	var team1 = homeTeam;
 	var team2 = roadTeam;
@@ -141,9 +145,10 @@ function predictScore(homeTeam, roadTeam){
 	   data: formData,
 	   success: function(results) {
 		 //console.log(results);
-		 var modelOrder = ['BayRidgeRegress', 'ArdRegress', 'HuberRegress', 'SgdRegress', 'TheilSenRegress', 'RansacRegress', 'modelMean'];
+		 var modelOrder = ['BayRidgeRegress', 'ArdRegress', 'HuberRegress', 'SgdRegress', 'TheilSenRegress', 'modelMean', 'RansacRegress'];
 		 var homeScores = [];
 		 var roadScores = [];
+		 var pointSpread = [];
 		 Object.keys(results)
 		 					 .sort(function modelSort(a,b) {
 								  return modelOrder.indexOf(a) > modelOrder.indexOf(b);
@@ -151,6 +156,7 @@ function predictScore(homeTeam, roadTeam){
 							 .forEach(function (v,i){
 								homeScores.push(Math.round(results[v][1]));
 								roadScores.push(Math.round(results[v][0]));
+								pointSpread.push(roadScores.slice(-1)[0]-homeScores.slice(-1)[0])
 							 });
 		 
 		 
@@ -161,14 +167,20 @@ function predictScore(homeTeam, roadTeam){
 		 table.style.float = 'left';
 		 table.border = "1";
 
+		 var headercap = document.createElement("caption");
+		 headercap.innerHTML = "Note: Model Mean Excludes RANSAC";
+		 table.appendChild(headercap);
+
 		 var header = ["Game Type", "Team"];
 		 var home_result = ["Home", team1];
 		 var road_result = ["Road", team2];
+		 var diff_result = ["Spread", "Home Team"];
 		  
 		 var model_results = new Array();
 		 model_results.push(header.concat(modelOrder));
 		 model_results.push(road_result.concat(roadScores));
 		 model_results.push(home_result.concat(homeScores));
+		 model_results.push(diff_result.concat(pointSpread));
 
 		 //Get the count of columns.
 		 var columnCount = model_results[0].length;

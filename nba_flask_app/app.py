@@ -197,13 +197,15 @@ def predictAllModels(testData):
 	mean[0] += temp[0]
 	mean[1] += temp[1]
 	predVals['TheilSenRegress'] = temp
+	# Don't include Ransac for now
+	predVals['modelMean'] = [mean[0]/len(predVals), mean[1]/len(predVals)]
 	# Deals better with large outliers in y
 	temp = [ransacRoad_model.predict(testData)[0], ransacHome_model.predict(testData)[0]]
 	mean[0] += temp[0]
 	mean[1] += temp[1]
 	predVals['RansacRegress'] = temp    
-		
-	predVals['modelMean'] = [mean[0]/len(predVals), mean[1]/len(predVals)]
+	
+	#predVals['modelMean'] = [mean[0]/len(predVals), mean[1]/len(predVals)]
 	return predVals
 
 @app.route("/api/predict_team_vs_team", methods=["POST"])
@@ -283,6 +285,15 @@ def getNbaStatsHistogram():
                      'OppTOV%', 'OppeFG%', 'PACE', 'PIE', 'REB%', 'TOV%', 'TS%', 'eFG%', 'Team']]
 	df = pd.concat([df_train, df_test])
 	return df.to_json(orient='records')
+
+@app.route("/api/predictorstats/team_elo")
+def getPredictorStatsTeamElo():
+	db = client.nba_data_db
+	temp = db.nba_teams_elo_season.find()
+	temp = list(temp)
+	for i in temp:
+		i.pop('_id', None)
+	return jsonify(temp[0])
 
 if __name__ == "__main__":
     app.run(debug=True)
