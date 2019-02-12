@@ -223,10 +223,6 @@ def predictTeamVsTeam():
 
 @app.route("/api/nba_daily_odds")
 def getPointsSpread():
-    # create mongo db connection
-    conn = 'mongodb://localhost:27017'
-    client = pymongo.MongoClient(conn)
-    # connect to my nba data db
     db = client.nba_data_db
     temp = db.nba_odds.find().sort('GameDate',pymongo.DESCENDING).limit(1)
     date_index = temp[0]['GameDate']
