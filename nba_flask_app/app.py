@@ -44,6 +44,10 @@ def nbapredictor():
 def nbastats():
 	return render_template("nbastats.html")
 
+@app.route("/predictorstats.html")
+def predictorstats():
+	return render_template("predictorstats.html")
+
 @app.route("/nba/teams")
 def nba_teams():
 	#print(station_name)
@@ -214,6 +218,23 @@ def predictTeamVsTeam():
 
 		return jsonify(predict_results)
 	return render_template("nbapredictor.html")
+
+@app.route("/api/nba_daily_odds")
+def getPointsSpread():
+    # create mongo db connection
+    conn = 'mongodb://localhost:27017'
+    client = pymongo.MongoClient(conn)
+    # connect to my nba data db
+    db = client.nba_data_db
+    temp = db.nba_odds.find().sort('GameDate',pymongo.DESCENDING).limit(1)
+    date_index = temp[0]['GameDate']
+    last_date = dateutil.parser.parse(date_index)
+    last_date = last_date.strftime('%m/%d/%Y')
+    temp = list(temp)
+    for i in temp:
+        i.pop('_id', None)
+    temp[0]['GameDate'] = last_date
+    return jsonify(temp[0])
 
 @app.route("/api/stats/<team>")
 def getTeamStats(team):

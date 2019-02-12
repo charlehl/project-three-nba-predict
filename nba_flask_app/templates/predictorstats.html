@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Stats</title>
+        <meta name="author" content="Charles Lee">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/style.css">
+    </head>
+<body>
+        {% include 'nav.html' %}
+        {% block content %}
+        {% endblock %}
+        <div class="container-fluid">
+            <div class="row">
+            <div class="col-md-12" style="text-align: center; color:black;">
+                <h1>NBA Stats Comparison</h1>
+            </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-3 col-md-2">
+                  <h3>Select Team and Stat:</h3>
+                  <select name="teamDropDownSelect" id="teamDropDownSelect" onchange="getData(this.value)"></select>
+                  <select name="statDropDownSelect" id="statDropDownSelect" onchange="getStatData(this.value)"> </select>
+                  <br><br>
+                  <div id="teamlogo"></div>
+              </div>
+              <div class="col-xs-10 col-md-10">
+                  <div id="barchart"></div>
+                  <br>
+                  <div id="teamtable"></div>
+                  <h5 style="text-align: center;"><b>Table Note: Team Stats for Current NBA Season</b></h5>
+                  <hr>
+                  <div id="historgram"></div>      
+              </div>
+            </div>
+        </div>
+
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="/static/js/nbastats.js"></script>
+</div>
+
+</body>
+
+</html>
+

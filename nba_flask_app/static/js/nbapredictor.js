@@ -140,7 +140,7 @@ function predictScore(homeTeam, roadTeam){
 	   url: '/api/predict_team_vs_team',
 	   data: formData,
 	   success: function(results) {
-		 console.log(results);
+		 //console.log(results);
 		 var modelOrder = ['BayRidgeRegress', 'ArdRegress', 'HuberRegress', 'SgdRegress', 'TheilSenRegress', 'RansacRegress', 'modelMean'];
 		 var homeScores = [];
 		 var roadScores = [];
@@ -228,6 +228,53 @@ async function initPage() {
 		document.getElementById("lastupdate").appendChild(updateTag);
 	});
 	predictScore(team1Select, team2Select);
+
+	odds_url = '/api/nba_daily_odds';
+	d3.json(odds_url).then(data => {
+		//console.log(data);
+		var odds_results = new Array();
+		odds_results.push(["Home Team", "Point Spread(Home Team)", "Road Team"]);
+		
+		data['homeTeam'].forEach(team => {
+			console.log(team);
+		});
+		data['homeTeam'].forEach((team, index) => {
+			odds_results.push([data['homeTeam'][index], data['pointSpread'][index], data['roadTeam'][index]]);
+		});
+		//console.log(odds_results);
+
+		//Create a HTML Table element.
+		var table = document.createElement("TABLE");
+		table.border = "1";
+
+		var headercap = document.createElement("caption");
+		headercap.innerHTML = "Odds for: " + data['GameDate'];
+		table.appendChild(headercap);
+	 
+		//Get the count of columns.
+		var columnCount = odds_results[0].length;
+	 
+		//Add the header row.
+		var row = table.insertRow(-1);
+		for (var i = 0; i < columnCount; i++) {
+			var headerCell = document.createElement("TH");
+			headerCell.innerHTML = odds_results[0][i];
+			row.appendChild(headerCell);
+		}
+	 
+		//Add the data rows.
+		for (var i = 1; i < odds_results.length; i++) {
+			row = table.insertRow(-1);
+			for (var j = 0; j < columnCount; j++) {
+				var cell = row.insertCell(-1);
+				cell.innerHTML = odds_results[i][j];
+			}
+		}
+	 
+		var dvTable = document.getElementById("dailyPointSpread");
+		dvTable.innerHTML = "";
+		dvTable.appendChild(table);
+	})
 }
 
 // Monitor submit button
@@ -236,9 +283,6 @@ $('#team-versus-submit').on('click', function(e){
 	//console.log("Why");
 	var team1 = $('select#teamOneDropDownSelect').val(),
 		team2 = $('select#teamTwoDropDownSelect').val();
-
-	//console.log(team1);
-	//console.log(team2);
 
 	predictScore(team1, team2);
   });
