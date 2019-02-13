@@ -41,13 +41,25 @@
            this using the stats eFG%, TOV%, OREB%, and FTRate respectively.  These factors can be expanded to the opposing 
            team as well to give a more accurate prediction which is what the "fourfactor" model uses for it's model predictor 
            features.</p>
-        <P>Although my initial model was incredibly accurate, I wanted to improve upon this model so I decided to use some of 
+        <P>Although my initial model was adequately accurate, I wanted to improve upon this model so I decided to use some of 
            the four factors with additional parameters. Recently, pace of play has become an emphasis in the NBA.  When I tried 
-           to use this in my, "mymodel" predictor, I found that the pace had little impact (low coefficient value) so I ended up 
-           experimenting with other parameters.  I eventually found that a team's defensive rating gave much better accuracy in 
+           to use this in my, "mymodel" predictor, I found that the pace had little impact on improving the accuracy so I ended up 
+           experimenting with other parameters.  I eventually found that a team's defensive rating gave better accuracy in 
            predictions.  I also used TS% instead of eFG% which takes into account three point field goal percentage and free throws.  
            Based upon these changes I was able to improve my model score from 0.9351(Four Factor Model) to 0.9775(My Model).
         </p>
+        <P>After presenting my project, I also wanted to add an ability to predict the score of games.  To do this, I used multiple regression 
+           models to experiment.  In order to predict scores, I fit my regression models to the previous season data similar to what was 
+           done for my win/loss predictor.  Additionally, since I needed to predict a score I need to develop a method to input parameters 
+           into my model.  In addition, I wanted to be able to get a feel for how good a team was at the current moment.  In order to do this 
+           I added a new feature of ELO score for the team.  The ELO score was taken from the previous season and was carried forward to the current.  
+           After each game I also updated the ELO score.  Additionally, I wanted to be able to capture the home/road factor for teams as well as 
+           current past performance for these instances.  Thus when I predicted scores I looked at performance for home and road games as well (using 
+           an average of the past five road or home game depending on match up) and fed my model based on these additional factors.  Since I know that 
+           predicting score is difficult I was hoping to see if I could more accurately predict the point spread versus the Vegas odd predictions.  I 
+           started to scrape odds data for match ups as well for comparison.  Thus far my models seem to predicted somewhat well for point spread and 
+           with a bit more work on feature selection and model tuning could be a viable tool for betting.
+       </p>
       </div>
       <div class="col-md-4" style="text-align: left; color:black;">
           <h2>Logistical Regression Model (Sci-Kit Learn)</h2>
