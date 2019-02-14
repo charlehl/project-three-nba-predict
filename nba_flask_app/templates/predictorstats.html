@@ -19,6 +19,7 @@
             <div class="row">
             <div class="col-md-12" style="text-align: center; color:black;">
                 <h1>Model Stats</h1>
+                <hr>
             </div>
             </div>
             <div class="row">
@@ -32,6 +33,19 @@
                   <div id="elochart"></div>
               </div>
             </div>
+            <hr>
+            <div class="row">
+                <div class="col-xs-3 col-md-2">
+                    <h3>Select Model:</h3>
+                    <select name="modelDropDownSelect" id="modelDropDownSelect" onchange="getModelData(this.value)"></select>
+                </div>
+                <div class="col-xs-5 col-md-5">
+                    <div id="modelchartroad"></div>
+                </div>
+                <div class="col-xs-5 col-md-5">
+                    <div id="modelcharthome"></div>
+                </div>
+              </div>
         </div>
 
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>

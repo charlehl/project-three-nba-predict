@@ -1,6 +1,9 @@
 var teamDisplay = "ATL";
 var teamEloData;
 
+var modelDisplay;
+var modelData;
+
 //Function to read the data from the selection of user and call the API
 async function getEloData(team){
 	teamDisplay = team;	
@@ -28,6 +31,10 @@ Array.prototype.remove = function() {
     return this;
 };
 
+function getModelData(model){
+	modelDisplay = model;
+	plotModelChart();
+}
 function plotEloChart(){
 	//console.log(statDisplay);
 	//console.log(teamDisplay);
@@ -53,6 +60,49 @@ function plotEloChart(){
 	Plotly.newPlot('elochart', data, layout, {responsive: true});
 }
 
+function plotModelChart() {
+	var last_feature = Object.keys(modelData[modelDisplay]['Home']['Coef']).length - 1;
+	
+	var data_road = [
+		{
+		  x: Object.values(modelData[modelDisplay]['Road']['Features']),
+		  y: Object.values(modelData[modelDisplay]['Road']['Coef']),
+		  type: 'bar'
+		}
+	];
+	var layout_road = {
+		title: `${modelDisplay} Coeffcient Plot (Road)`,
+		xaxis: {
+			title: 'Features',
+			tickangle: 45
+		},
+		yaxis: {
+			title: 'Coeffcient Values',
+			range: [modelData[modelDisplay]['Road']['Coef'][0]-2, modelData[modelDisplay]['Road']['Coef'][last_feature]+1]
+		}
+	};
+	
+	var data_home = [
+		{
+		  x: Object.values(modelData[modelDisplay]['Home']['Features']),
+		  y: Object.values(modelData[modelDisplay]['Home']['Coef']),
+		  type: 'bar'
+		}
+	];
+	var layout_home = {
+		title: `${modelDisplay} Coeffcient Plot (Home)`,
+		xaxis: {
+			title: 'Features',
+			tickangle: 45
+		},
+		yaxis: {
+			title: 'Coeffcient Values',
+			range: [modelData[modelDisplay]['Home']['Coef'][0]-2, modelData[modelDisplay]['Home']['Coef'][last_feature]+1]
+		}
+	};
+	Plotly.newPlot('modelchartroad', data_road, layout_road, {responsive: true});
+	Plotly.newPlot('modelcharthome', data_home, layout_home, {responsive: true});
+}
 async function initPage() {
 	var url = "/nba/teams";
 	//var statsHeader = ['AST%', 'AST/TO', 'ASTRatio'];
@@ -74,5 +124,25 @@ async function initPage() {
 	});
 	//console.log(teamEloData);
 	getEloData(teamDisplay);
+	
+	url = "/api/predictorstats/model_coef";
+	modelData = await d3.json(url).then(function(data) {
+		//console.log(data);
+		select = document.getElementById("modelDropDownSelect");
+		select.innerHTML = "";
+		//select.innerHTML += "<option value=\"" + All + "\">" + All + "</option>"; 
+	 	data.forEach(data => {
+	 		//console.log(data)
+	 		select.innerHTML += "<option value=\"" + data['Model'] + "\">" + data['Model'] + "</option>";
+		});
+		modelDisplay = data[0]['Model'];
+		temp = data.reduce(function(result, item, index, array) {
+			result[item['Model']] = item['Params'];
+			return result;
+		}, {});
+		return temp;
+	});
+	//console.log(modelData[modelDisplay]['Road']['Coef']);
+	getModelData(modelDisplay);
 }
 initPage();

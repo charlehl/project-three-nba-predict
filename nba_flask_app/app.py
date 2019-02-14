@@ -291,5 +291,14 @@ def getPredictorStatsTeamElo():
 		i.pop('_id', None)
 	return jsonify(temp[0])
 
+@app.route("/api/predictorstats/model_coef")
+def getPredictorStatsModelCoef():
+	db = client.nba_data_db
+	temp = db.score_pred_model_data.find()
+	temp = list(temp)
+	for i in temp:
+		i.pop('_id', None)
+	return jsonify(temp)
+
 if __name__ == "__main__":
     app.run(debug=True)

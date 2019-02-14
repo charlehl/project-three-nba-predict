@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"nba_data_db.nba_team_current_elo"}],"uuid":"9dec8d8a7e6940a0a0e89b5ae0a173d5"}
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"nba_data_db.nba_team_current_elo"}],"uuid":"6145874d66734577a52824bc02b3673e"}
