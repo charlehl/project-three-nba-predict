@@ -6,8 +6,8 @@ html, body {
 }
 
 body {
-  /* background-image: url("paper.gif"); */
   /* background-color: #1b7bd4; */
+  background: url("/static/images/pipes.png");
  }
 
 table, th, td {
@@ -47,7 +47,9 @@ th, td {
 th {background-color: #85878a;}
 tr:nth-child(even) {background-color: #1186b4;}
 tr:nth-child(odd) {background-color: #ced122;}
-
+.teamtable {
+  margin-left: 20%; 
+}
 .resultTable {
   display: block;
   /* margin-top: 100px; */

@@ -55,7 +55,9 @@ function plotEloChart(){
 		},
 		yaxis: {
 			title: 'ELO Score',
-		}
+		},
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)'
 	};
 	Plotly.newPlot('elochart', data, layout, {responsive: true});
 }
@@ -79,7 +81,9 @@ function plotModelChart() {
 		yaxis: {
 			title: 'Coeffcient Values',
 			range: [modelData[modelDisplay]['Road']['Coef'][0]-2, modelData[modelDisplay]['Road']['Coef'][last_feature]+1]
-		}
+		},
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)'
 	};
 	
 	var data_home = [
@@ -98,7 +102,9 @@ function plotModelChart() {
 		yaxis: {
 			title: 'Coeffcient Values',
 			range: [modelData[modelDisplay]['Home']['Coef'][0]-2, modelData[modelDisplay]['Home']['Coef'][last_feature]+1]
-		}
+		},
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)'
 	};
 	Plotly.newPlot('modelchartroad', data_road, layout_road, {responsive: true});
 	Plotly.newPlot('modelcharthome', data_home, layout_home, {responsive: true});

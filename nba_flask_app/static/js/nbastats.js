@@ -39,6 +39,9 @@ Array.prototype.remove = function() {
     }
     return this;
 };
+function round(value, decimals) {
+	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
 function displayStats() {
 	//console.log(teamStats);
 	var stats = Object.keys(teamStats[0]);
@@ -51,7 +54,7 @@ function displayStats() {
 	Object.keys(teamStats);
 	var statArrayLoss = Object.keys(teamStats[0]).map(function(key) {
 		if(key != 'W/L') {
-			return teamStats[0][key];
+			return round(teamStats[0][key], 2);
 		}
 		else {
 			return "-1";
@@ -59,7 +62,7 @@ function displayStats() {
 	});
 	var statArrayWin = Object.keys(teamStats[1]).map(function(key) {
 		if(key != 'W/L') {
-			return teamStats[1][key];
+			return round(teamStats[1][key],2);
 		}
 		else {
 			return "-1";
@@ -124,7 +127,9 @@ function getStatData(stat){
 	var layout = {
 		barmode: 'group',
 		title: `${stat}`,
-		xaxis: {title: 'Mean Comparison Wins Vs. Losses'}
+		xaxis: {title: 'Mean Comparison Wins Vs. Losses'},
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)'
 	};
 
 	Plotly.newPlot('barchart', data, layout, {responsive: true});
@@ -181,6 +186,8 @@ function plotHistogram(){
 		//barmode: "stack",
 		barmode: "overlay",
 		title: `Histogram Plot ${statDisplay}`,
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)'
 	};
 	Plotly.newPlot('historgram', data, layout, {responsive: true});
 }
