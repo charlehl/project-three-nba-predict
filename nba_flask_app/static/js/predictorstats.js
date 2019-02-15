@@ -1,6 +1,8 @@
 var teamDisplay = "ATL";
 var teamEloData;
 
+var eloRanks;
+
 var modelDisplay;
 var modelData;
 
@@ -61,7 +63,33 @@ function plotEloChart(){
 	};
 	Plotly.newPlot('elochart', data, layout, {responsive: true});
 }
-
+function plotEloRanks(){
+	var data = [
+		{
+		  x: Object.values(eloRanks['Team']).map((value, index) => {
+			  var rank = index+1;
+			  return `${rank}: ${value}`;
+		  }),
+		  y: Object.values(eloRanks['ELO']),
+		  type: 'bar',
+		  marker: {'color': Object.values(eloRanks['ELO']),
+                  'colorscale': 'Portland'}
+		}
+	];
+	var layout = {
+		title: `Current Season ELO Ranking`,
+		xaxis: {
+			title: 'Team',
+			tickangle: 45
+		},
+		yaxis: {
+			title: 'Team ELO',
+		},
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)'
+	};
+	Plotly.newPlot('elorank', data, layout, {responsive: true});
+}
 function plotModelChart() {
 	var last_feature = Object.keys(modelData[modelDisplay]['Home']['Coef']).length - 1;
 	
@@ -150,5 +178,12 @@ async function initPage() {
 	});
 	//console.log(modelData[modelDisplay]['Road']['Coef']);
 	getModelData(modelDisplay);
+
+	url = "/api/predictorstats/elo_rank"
+	eloRanks = await d3.json(url).then(data => {
+		//console.log(data);
+		return data;
+	});
+	plotEloRanks();
 }
 initPage();

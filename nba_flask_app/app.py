@@ -291,6 +291,18 @@ def getPredictorStatsTeamElo():
 		i.pop('_id', None)
 	return jsonify(temp[0])
 
+@app.route("/api/predictorstats/elo_rank")
+def getPredictorStatsEloRank():
+	db = client.nba_data_db
+	temp = db.nba_team_current_elo.find()
+	temp = list(temp)
+	for i in temp:
+		i.pop('_id', None)
+	df_elo = pd.DataFrame(temp).T.reset_index()
+	df_elo.columns = ['Team', 'ELO']
+	df_elo = df_elo.sort_values(['ELO'], ascending=False).reset_index(drop=True)
+	return df_elo.to_json(orient='columns')
+
 @app.route("/api/predictorstats/model_coef")
 def getPredictorStatsModelCoef():
 	db = client.nba_data_db
