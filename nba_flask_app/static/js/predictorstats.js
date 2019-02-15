@@ -79,7 +79,7 @@ function plotEloRanks(){
 	var layout = {
 		title: `Current Season ELO Ranking`,
 		xaxis: {
-			title: 'Team',
+			title: 'Team Rank',
 			tickangle: 45
 		},
 		yaxis: {
