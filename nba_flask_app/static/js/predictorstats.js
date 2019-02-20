@@ -5,6 +5,7 @@ var eloRanks;
 
 var modelDisplay;
 var modelData;
+var modelRegressData;
 
 //Function to read the data from the selection of user and call the API
 async function getEloData(team){
@@ -36,6 +37,7 @@ Array.prototype.remove = function() {
 function getModelData(model){
 	modelDisplay = model;
 	plotModelChart();
+	createModelRegressTable();
 }
 function plotEloChart(){
 	//console.log(statDisplay);
@@ -137,6 +139,53 @@ function plotModelChart() {
 	Plotly.newPlot('modelchartroad', data_road, layout_road, {responsive: true});
 	Plotly.newPlot('modelcharthome', data_home, layout_home, {responsive: true});
 }
+
+function round(value, decimals) {
+	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+
+function createModelRegressTable() {
+	//console.log(modelRegressData);
+	var stats = Object.keys(modelRegressData);
+	//console.log(stats);
+	//console.log(modelDisplay);
+	var model_stats = new Array();
+	var temp = [modelDisplay];
+	model_stats.push(temp.concat(stats));
+	var displayStats = Object.keys(modelRegressData).map(function(key) {
+			return round(modelRegressData[key][modelDisplay],2);
+	});
+	temp = ['Home-Road Score Delta'];
+	model_stats.push(temp.concat(displayStats));
+	//console.log(model_stats);
+	//Create a HTML Table element.
+	var table = document.createElement("TABLE");
+	table.border = "1";
+	
+	//Get the count of columns.
+	var columnCount = model_stats[0].length;
+	
+	//Add the header row.
+	var row = table.insertRow(-1);
+	for (var i = 0; i < columnCount; i++) {
+		var headerCell = document.createElement("TH");
+		headerCell.innerHTML = model_stats[0][i];
+		row.appendChild(headerCell);
+	}
+	
+	//Add the data rows.
+	for (var i = 1; i < model_stats.length; i++) {
+		row = table.insertRow(-1);
+		for (var j = 0; j < columnCount; j++) {
+			var cell = row.insertCell(-1);
+			cell.innerHTML = model_stats[i][j];
+		}
+	}
+	 
+	var dvTable = document.getElementById("modelregresstable");
+	dvTable.innerHTML = "";
+	dvTable.appendChild(table);
+}
 async function initPage() {
 	var url = "/nba/teams";
 	//var statsHeader = ['AST%', 'AST/TO', 'ASTRatio'];
@@ -177,7 +226,6 @@ async function initPage() {
 		return temp;
 	});
 	//console.log(modelData[modelDisplay]['Road']['Coef']);
-	getModelData(modelDisplay);
 
 	url = "/api/predictorstats/elo_rank"
 	eloRanks = await d3.json(url).then(data => {
@@ -185,5 +233,12 @@ async function initPage() {
 		return data;
 	});
 	plotEloRanks();
+
+	url = "/api/predictorstats/model_regress"
+	modelRegressData = await d3.json(url).then(function(data){
+		return data;
+	});
+	getModelData(modelDisplay);
+	//console.log(modelRegressData);
 }
 initPage();

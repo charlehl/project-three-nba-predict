@@ -2,12 +2,18 @@
 function initPage() {
 	var url = "/api/model_params";
 	d3.json(url).then(function(data) {
-		//console.log(data[0]);
+		console.log(data[0]);
 		// Create Coefficient table for fourfactor
 		var model_params = new Array();
 		model_params.push(["Coefficient", "Value"]);
-		Object.keys(data[0]['Params']).forEach(function(key) {
-			model_params.push([key, data[0]['Params'][key]]);
+		var myObj = Object.keys(data[0]['Params'])
+			  .sort((a,b) => data[0]['Params'][a]-data[0]['Params'][b])
+			  .reduce((_sortedObj, key) => ({
+				  ..._sortedObj,
+				  [key]: data[0]['Params'][key]
+			  }), {});
+		Object.keys(myObj).forEach(function(key) {
+			model_params.push([key, myObj[key]]);
 		});
 		//Create a HTML Table element.
 		var table = document.createElement("table");
@@ -37,8 +43,14 @@ function initPage() {
 		//console.log(data[1]);
 		var model_params = new Array();
 		model_params.push(["Coefficient", "Value"]);
-		Object.keys(data[1]['Params']).forEach(function(key) {
-			model_params.push([key, data[1]['Params'][key]]);
+		myObj = Object.keys(data[1]['Params'])
+			  .sort((a,b) => data[1]['Params'][a]-data[1]['Params'][b])
+			  .reduce((_sortedObj, key) => ({
+				  ..._sortedObj,
+				  [key]: data[1]['Params'][key]
+			  }), {});
+		Object.keys(myObj).forEach(function(key) {
+			model_params.push([key, myObj[key]]);
 		});
 		//Create a HTML Table element.
 		var table = document.createElement("table");

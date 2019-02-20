@@ -145,7 +145,8 @@ function predictScore(homeTeam, roadTeam){
 	   data: formData,
 	   success: function(results) {
 		 //console.log(results);
-		 var modelOrder = ['BayRidgeRegress', 'ArdRegress', 'HuberRegress', 'SgdRegress', 'TheilSenRegress', 'modelMean', 'RansacRegress'];
+		 //var modelOrder = ['BayRidgeRegress', 'ArdRegress', 'HuberRegress', 'SgdRegress', 'TheilSenRegress', 'modelMean', 'RansacRegress'];
+		 var modelOrder = ['BayRidgeRegress', 'ArdRegress', 'HuberRegress', 'SgdRegress', 'TheilSenRegress', 'modelMean'];
 		 var homeScores = [];
 		 var roadScores = [];
 		 var pointSpread = [];
@@ -167,9 +168,9 @@ function predictScore(homeTeam, roadTeam){
 		 table.style.float = 'left';
 		 table.border = "1";
 
-		 var headercap = document.createElement("caption");
-		 headercap.innerHTML = "Note: Model Mean Excludes RANSAC";
-		 table.appendChild(headercap);
+		 //var headercap = document.createElement("caption");
+		 //headercap.innerHTML = "Note: Model Mean Excludes RANSAC";
+		 //table.appendChild(headercap);
 
 		 var header = ["Game Type", "Team"];
 		 var home_result = ["Home", team1];
@@ -231,6 +232,7 @@ async function initPage() {
 	team2Select = 'BKN';
 	getData('ATL');
 	team2Data('ATL');
+	predictScore(team1Select, team2Select);
 	url = '/api/get_db_lastupdate';
 	d3.json(url).then(data => {
 		//console.log(data);

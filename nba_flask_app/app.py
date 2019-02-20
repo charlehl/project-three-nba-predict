@@ -135,8 +135,8 @@ def getHomeRoadMeans(teamRoad, teamHome):
 	df_test = df_test.sort_values(['GameDate'], ascending=0).reset_index(drop=True)
 	home_df = df_test[df_test['HomeTeam'] == teamHome].reset_index(drop=True)
 	road_df = df_test[df_test['RoadTeam'] == teamRoad].reset_index(drop=True)
-	homeMean = home_df[0:5].mean()
-	roadMean = road_df[0:5].mean()
+	homeMean = home_df[0:10].mean()
+	roadMean = road_df[0:10].mean()
 	test_series = pd.Series(data = [homeMean['DefRtg_h'], homeMean['PIE_h'], homeMean['FTARate_h'], homeMean['REB%_h'], homeMean['TOV%_h'], homeMean['TS%_h'], homeMean['PACE_h'], homeMean['ELO_h'],
 									roadMean['DefRtg_r'], roadMean['PIE_r'], roadMean['FTARate_r'], roadMean['REB%_r'], roadMean['TOV%_r'], roadMean['TS%_r'], roadMean['PACE_r'], roadMean['ELO_r']
 	])
@@ -311,6 +311,15 @@ def getPredictorStatsModelCoef():
 	for i in temp:
 		i.pop('_id', None)
 	return jsonify(temp)
+
+@app.route("/api/predictorstats/model_regress")
+def getPredictorStatsModelRegress():
+	db = client.nba_data_db
+	temp = db.model_regress_data.find()
+	temp = list(temp)
+	for i in temp:
+		i.pop('_id', None)
+	return jsonify(temp[0])
 
 if __name__ == "__main__":
     app.run(debug=True)
