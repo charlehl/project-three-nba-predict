@@ -155,8 +155,8 @@ def predictAllModels(testData):
 	sgdRoad_filename = "./models/sgd_road_model.pkl"
 	theilHome_filename = "./models/theil_sen_home_model.pkl"
 	theilRoad_filename = "./models/theil_sen_road_model.pkl"
-	ransacHome_filename = "./models/ransac_home_model.pkl"
-	ransacRoad_filename = "./models/ransac_road_model.pkl"
+	#ransacHome_filename = "./models/ransac_home_model.pkl"
+	#ransacRoad_filename = "./models/ransac_road_model.pkl"
 
 	bayHome_model = pickle.load(open(bayHome_filename, 'rb'))
 	bayRoad_model = pickle.load(open(bayRoad_filename, 'rb'))
@@ -168,8 +168,8 @@ def predictAllModels(testData):
 	sgdRoad_model = pickle.load(open(sgdRoad_filename, 'rb'))
 	theilHome_model = pickle.load(open(theilHome_filename, 'rb'))
 	theilRoad_model = pickle.load(open(theilRoad_filename, 'rb'))
-	ransacHome_model = pickle.load(open(ransacHome_filename, 'rb'))
-	ransacRoad_model = pickle.load(open(ransacRoad_filename, 'rb'))
+	#ransacHome_model = pickle.load(open(ransacHome_filename, 'rb'))
+	#ransacRoad_model = pickle.load(open(ransacRoad_filename, 'rb'))
 
 	predVals = {}
 
@@ -200,10 +200,10 @@ def predictAllModels(testData):
 	# Don't include Ransac for now
 	predVals['modelMean'] = [mean[0]/len(predVals), mean[1]/len(predVals)]
 	# Deals better with large outliers in y
-	temp = [ransacRoad_model.predict(testData)[0], ransacHome_model.predict(testData)[0]]
-	mean[0] += temp[0]
-	mean[1] += temp[1]
-	predVals['RansacRegress'] = temp    
+	#temp = [ransacRoad_model.predict(testData)[0], ransacHome_model.predict(testData)[0]]
+	#mean[0] += temp[0]
+	#mean[1] += temp[1]
+	#predVals['RansacRegress'] = temp    
 	
 	#predVals['modelMean'] = [mean[0]/len(predVals), mean[1]/len(predVals)]
 	return predVals

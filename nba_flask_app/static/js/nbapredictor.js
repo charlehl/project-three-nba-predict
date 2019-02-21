@@ -232,7 +232,7 @@ async function initPage() {
 	team2Select = 'BKN';
 	getData('ATL');
 	team2Data('ATL');
-	predictScore(team1Select, team2Select);
+	//predictScore(team1Select, team2Select);
 	url = '/api/get_db_lastupdate';
 	d3.json(url).then(data => {
 		//console.log(data);
