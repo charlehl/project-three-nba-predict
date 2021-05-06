@@ -3,7 +3,7 @@ click==6.7
 decorator==4.1.2
 Flask==1.0.0
 pymongo==3.7.2
-Flask-Cors==3.0.4
+Flask-Cors==3.0.9
 Flask-PyMongo==2.1.0
 ipython==6.2.1
 ipython-genutils==0.2.0
